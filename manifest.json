@@ -1,0 +1,23 @@
+{
+    "manifest_version": 3,
+    "name": "My Shopping Cart Extension",
+    "version": "1.0",
+    "permissions": [
+      "storage",
+      "activeTab",
+      "webRequest",
+      "webRequestBlocking",
+      "tabs"
+    ],
+    "host_permissions": [
+      "https://www.aritzia.com/*"
+    ],   
+    "background": {
+      "service_worker": "background.js",
+      "type": "module"
+    },
+    "action": {
+      "default_popup": "popup.html"
+    }
+  }
+  
