@@ -1,15 +1,6 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import Product from './models/Product.js';
 import Store from './models/Store.js';
-import { StoreName } from './models/StoreName.js';
+import { StoreName } from './src/popup/models/StoreName.js';
 const ADD_TO_CART_URL = 'https://www.aritzia.com/en/mylist/add';
 const addCartURLPattern = `${ADD_TO_CART_URL}*`;
 let currentRequestHeaders;

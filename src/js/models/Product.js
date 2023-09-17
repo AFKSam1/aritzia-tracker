@@ -5,6 +5,7 @@ class Product {
         this.currentPrice = currentPrice;
         this.imgUrl = imgUrl;
         this.productUrl = productUrl;
+        this.previousPrices = [];
     }
 }
 export default Product;
