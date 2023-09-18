@@ -24,7 +24,7 @@ class Store {
     getAllProducts(){
         return this.products;
     }
-    async fetchProductData(productId) {
+    async fetchAllProductsData(productId) {
         // Generic fetch logic (likely overridden by subclasses)
     }
 

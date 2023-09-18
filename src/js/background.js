@@ -69,6 +69,7 @@ chrome.webRequest.onCompleted.addListener(
 
         if (storeInstances[domain] &&!storeInstances[domain].isFetching) {
             storeInstances[domain].handleAddToCart(details.url);
+            console.log("Cart contains : ", storeInstances[domain].getAllProducts());
         }
       }
     }
@@ -76,4 +77,19 @@ chrome.webRequest.onCompleted.addListener(
   { urls: ['<all_urls>'] }
 );
 
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.command === 'fetchAllProductsData') {
+        console.log("here")
+      const storeInstance = storeInstances[request.storeName];
+      if (storeInstance) {
+        storeInstance.fetchAllProductsData();
+        sendResponse({ success: true });
+      } else {
+        sendResponse({ success: false });
+      }
+    }
+    // Handle other commands...
+  });
+  
 

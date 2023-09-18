@@ -10,7 +10,7 @@ class Primitive extends Store{
     }
 
 
-    async fetchProductData(productId) {
+    async fetchAllProductsData(productId) {
         // fetch logic 
     }
 
