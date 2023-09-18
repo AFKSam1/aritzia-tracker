@@ -2,9 +2,16 @@ class Store {
     constructor(name) {
         this.name = name;
         this.products = [];
+        this.headerObject = {};
     }
     addProduct(product) {
         this.products.push(product);
+    }
+
+    setHeaderObject(headersObject){
+        console.log(headersObject)
+        this.headerObject = headersObject;
+        console.log("Headers were set to : ",this.headerObject);
     }
 
     removeProduct(productId) {
