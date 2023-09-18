@@ -51,8 +51,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 
 chrome.webRequest.onCompleted.addListener(
   function(details) {
-    const headersObject = createHeadersObject(details.requestHeaders);
-    if (headersObject['My-Custom-Header']) return; // Ignore if custom header is set
+
     const url = new URL(details.url);
     const domain = url.hostname.split('.')[1]; // Extract base domain
 
@@ -68,7 +67,7 @@ chrome.webRequest.onCompleted.addListener(
           }
         }
 
-        if (storeInstances[domain]) {
+        if (storeInstances[domain] &&!storeInstances[domain].isFetching) {
             storeInstances[domain].handleAddToCart(details.url);
         }
       }

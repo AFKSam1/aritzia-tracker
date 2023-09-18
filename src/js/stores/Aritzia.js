@@ -23,12 +23,17 @@ class Aritzia extends Store{
         console.log("In handleAddToCart Aritza");
         let header = {...this.headerObject}
         header['My-Custom-Header'] = 'true'; // Add a custom header
+        this.isFetching = true;
+
         const response = await fetch(url, {
             method: 'GET',
             credentials: 'include',
             headers: header
           });
-          console.log(response.body)
+        const data = await response.json()
+        console.log(data.wishlist[0])
+        this.isFetching = true;
+
     }
 
 }
