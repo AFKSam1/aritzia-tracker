@@ -1,23 +1,29 @@
 {
     "manifest_version": 3,
-    "name": "My Shopping Cart Extension",
-    "version": "1.0",
+    "name": "Price Drop Tracker",
+    "version": "1.0.0",
+    "description": "Tracks price drops of shopping cart items on different stores.",
     "permissions": [
-      "storage",
-      "activeTab",
       "webRequest",
       "webRequestBlocking",
-      "tabs"
+      "tabs",
+      "<all_urls>"
     ],
     "host_permissions": [
-      "https://www.aritzia.com/*"
-    ],   
+      "http://*/*",
+      "https://*/*"
+    ],
     "background": {
-      "service_worker": "background.js",
-      "type": "module"
+      "service_worker": "js/background.js"
     },
     "action": {
-      "default_popup": "popup.html"
-    }
+      "default_popup": "js/popup/popup.html"
+    },
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["js/Cart.js", "js/models/Product.js", "js/models/Store.js"]
+      }
+    ]
   }
   

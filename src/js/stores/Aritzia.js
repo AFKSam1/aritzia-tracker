@@ -1,12 +1,13 @@
+// Inherited methods:
+//  addProduct(product)
+//  removeProduct(productId)
+//  findProductById(productId)
+//  getAllProducts()
+
 class Aritzia extends Store{
     constructor(name) {
         super(name);
     }
-    // Inherited methods:
-    //  addProduct(product)
-    //  removeProduct(productId)
-    //  findProductById(productId)
-    //  getAllProducts()
 
     async fetchProductData(productId) {
         // Generic fetch logic (likely overridden by subclasses)
@@ -17,3 +18,5 @@ class Aritzia extends Store{
     }
 
 }
+
+export default Aritzia;
