@@ -3,27 +3,17 @@
     "name": "Price Drop Tracker",
     "version": "1.0.0",
     "description": "Tracks price drops of shopping cart items on different stores.",
-    "permissions": [
-      "webRequest",
-      "webRequestBlocking",
-      "tabs",
-      "<all_urls>"
-    ],
+    "permissions": ["webRequest","webRequestBlocking","tabs"],
     "host_permissions": [
       "http://*/*",
       "https://*/*"
     ],
     "background": {
-      "service_worker": "js/background.js"
+      "service_worker": "./src/js/background.js",
+      "type":"module"
     },
     "action": {
-      "default_popup": "js/popup/popup.html"
-    },
-    "content_scripts": [
-      {
-        "matches": ["<all_urls>"],
-        "js": ["js/Cart.js", "js/models/Product.js", "js/models/Store.js"]
-      }
-    ]
+      "default_popup": "./src/js/popup/popup.html"
+    }
   }
   
