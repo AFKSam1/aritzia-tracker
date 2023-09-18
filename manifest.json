@@ -3,7 +3,7 @@
     "name": "Price Drop Tracker",
     "version": "1.0.0",
     "description": "Tracks price drops of shopping cart items on different stores.",
-    "permissions": ["webRequest","webRequestBlocking","tabs"],
+    "permissions": ["webRequest","webRequestBlocking","tabs","webNavigation","scripting","activeTab"],
     "host_permissions": [
       "http://*/*",
       "https://*/*"
