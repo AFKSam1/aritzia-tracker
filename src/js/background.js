@@ -1,18 +1,29 @@
 // background.js
 import Product from "./models/product.js";
 import Aritzia from "./stores/aritzia.js";
+import Primitiveskate from "./stores/Primitiveskate.js";
 import helpers from "./utils/helpers.js";
 
-const storeClasses = {
-    aritzia: Aritzia,
-    // add more stores here
-};
+// Initialize store classes and instances
+const storeClasses = initializeStoreClasses();
+const storeInstances = initializeStoreInstances(storeClasses);
 
-const storeInstances = {};
-
-for (const [domain, StoreClass] of Object.entries(storeClasses)) {
-    storeInstances[domain] = new StoreClass(domain);
-}
+// Chrome runtime message listener
+chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+    switch (request.command) {
+        case "clearChromeStorage":
+            clearChromeStorage();
+            break;
+        case "bookmarkPage":
+            await handleBookmarkPage(request.url);
+            break;
+        case "fetchAllProducts":
+            // Your code for fetching all products
+            break;
+        default:
+            console.error("Unknown command");
+    }
+});
 
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     if (request.command === "clearChromeStorage") {
@@ -33,6 +44,22 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
 });
 
 
+function clearChromeStorage() {
+    chrome.storage.sync.clear(() => {
+        console.log("Storage is cleared.");
+    });
+}
+
+
+
+async function handleBookmarkPage(url) {
+    const parsedUrl = new URL(url);
+    const domain = helpers.extractBaseDomain(parsedUrl);
+    await manageBookmarkedProduct(url, domain);
+}
+
+
+
 async function manageBookmarkedProduct(url, domain) {
     try {
         const key = `${domain}_products`;
@@ -43,13 +70,21 @@ async function manageBookmarkedProduct(url, domain) {
         }
 
         if (!storeInstances[domain]) {
+            console.log("Initializing store instance...");
             storeInstances[domain] = new storeClasses[domain](domain);
+            console.log(`Initialized store instance for domain: ${domain}`);
+        } else {
+            console.log(`Store instance already exists for domain: ${domain}`);
         }
 
+        console.log("Fetching existing products...");
         let existingProducts = await storeInstances[domain].fetchAllProductsData(key);
+        console.log("Fetched existing products:", existingProducts);
 
         if (!existingProducts.hasOwnProperty(url)) {
+            console.log("Fetching additional product data...");
             const additionalProductData = await fetchAdditionalProductData(url, domain);
+            console.log("Fetched additional product data:", additionalProductData);
 
             existingProducts[url] = new Product(
                 additionalProductData.title,
@@ -65,35 +100,54 @@ async function manageBookmarkedProduct(url, domain) {
             console.log(`The store: ${domain} contains these products:`, products);
         }
     } catch (error) {
-        console.error(`An error occurred while managing the bookmarked product:`,error);
+        console.error(`An error occurred while managing the bookmarked product:`, error);
         console.log(error);  // Log the full error object
-
     }
 }
 
 async function fetchAdditionalProductData(url, domain) {
     const response = await fetch(url);
     const htmlText = await response.text();
-
+  
     return new Promise((resolve, reject) => {
         chrome.tabs.query({ active: true }, function (tabs) {
-            const aritziaTab = tabs.find((tab) => tab.url.includes("aritzia.com"));
-
-            if (!aritziaTab) {
+            const targetTab = tabs.find((tab) => tab.url.includes(domain));
+  
+            if (!targetTab) {
                 return reject(new Error("No matching tab found"));
             }
-
+  
             chrome.tabs.sendMessage(
-                aritziaTab.id,
+                targetTab.id,
                 { action: "parseHtml", htmlText: htmlText, domain: domain },
                 function (response) {
                     if (chrome.runtime.lastError) {
                         return reject(new Error(chrome.runtime.lastError));
                     }
-
+  
                     resolve(response.parsedData);
                 }
             );
         });
     });
+}
+
+
+
+// Initialize store classes
+function initializeStoreClasses() {
+    return {
+        aritzia: Aritzia,
+        primitiveskate:Primitiveskate,
+        // add more stores here
+    };
+}
+
+// Initialize store instances
+function initializeStoreInstances(storeClasses) {
+    const instances = {};
+    for (const [domain, StoreClass] of Object.entries(storeClasses)) {
+        instances[domain] = new StoreClass(domain);
+    }
+    return instances;
 }

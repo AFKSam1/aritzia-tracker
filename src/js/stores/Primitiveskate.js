@@ -4,20 +4,23 @@
 //  findProductById(productId)
 //  getAllProducts()
 import Store from '../models/store.js';
-class Primitive extends Store{
+class Primitiveskate extends Store{
     constructor(name) {
         super(name);
     }
 
+    async fetchPriceAndStock(url) {
 
-    async fetchAllProductsData(productId) {
+    }
+
+    async updateProductPriceAndStock(url, product) {
         // fetch logic 
     }
 
-    async updateProductPrice(productId) {
+    async updateAllProductsPriceAndStock() {
         //update logic
     }
  
 }
 
-export default Primitive;
+export default Primitiveskate;

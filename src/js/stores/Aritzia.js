@@ -4,14 +4,13 @@
 //  findProductById(productId)
 //  getAllProducts()
 import Store from "../models/store.js";
-import Product from "../models/product.js";
 
 class Aritzia extends Store {
     constructor(name) {
         super(name);
     }
 
-    async fetchData(url) {
+    async fetchPriceAndStock(url) {
         let data = {};
         const response = await fetch(url);
         const htmlText = await response.text();
@@ -54,15 +53,31 @@ class Aritzia extends Store {
         return data;
     }
 
-    async updateProductPrice(url, product) {
+
+    async updateProductPriceAndStock(url, product) {
         try {
             // Fetch and parse product data
-            const newProductData = await this.fetchData(url);
+            const newProductData = await this.fetchPriceAndStock(url);
 
-            // Update the Chrome storage with new price
-            const updatedProduct = { ...product, currentPrice: newProductData.price };
+            // Fetch existing products from 'aritzia_products'
+            const existingData = await new Promise((resolve, reject) => {
+                chrome.storage.sync.get("aritzia_products", function(result) {
+                    if (chrome.runtime.lastError) {
+                        return reject(new Error(chrome.runtime.lastError));
+                    }
+                    resolve(result.aritzia_products || {});
+                });
+            });
+
+            // Create updated product object
+            const updatedProduct = { ...product, currentPrice: newProductData.price, stockInfo: newProductData.stockInfo };
+
+            // Update the specific product within the existing data
+            existingData[url] = updatedProduct;
+
+            // Store back the complete 'aritzia_products' object
             await new Promise((resolve, reject) => {
-                chrome.storage.sync.set({ [url]: updatedProduct }, function () {
+                chrome.storage.sync.set({ "aritzia_products": existingData }, function() {
                     if (chrome.runtime.lastError) {
                         return reject(new Error(chrome.runtime.lastError));
                     }
@@ -74,18 +89,20 @@ class Aritzia extends Store {
         }
     }
 
-    async updateAllProductsPrice() {
+    async updateAllProductsPriceAndStock() {
         try {
-            const allProducts = await this.fetchAllProductsData("aritzia_products"); // Assuming this returns a dictionary where keys are URLs
+            // Assuming fetchAllProductsData is a method that fetches all products under 'aritzia_products'
+            const allProducts = await this.fetchAllProductsData("aritzia_products"); 
             for (const [url, product] of Object.entries(allProducts)) {
-                await this.updateProductPrice(url, product);
+                await this.updateProductPriceAndStock(url, product);
             }
         } catch (error) {
             console.error("Error updating all product prices:", error);
         }
     }
 
-    async updateAllProductsStock() {}
+
+    
 }
 
 export default Aritzia;

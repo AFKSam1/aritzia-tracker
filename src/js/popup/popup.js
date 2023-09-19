@@ -87,7 +87,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     productListDiv.appendChild(productCard);
 
-                    productListDiv.appendChild(productCard);
                 }
             }
         });
@@ -98,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateAllPricesBtn.addEventListener("click", () => {
         aritziaStore
-            .updateAllProductsPrice()
+            .updateAllProductsPriceAndStock()
             .then(() => {
                 console.log("All product prices updated");
             })

@@ -5,7 +5,9 @@ class Store {
   
  
 
+    async fetchPriceAndStock(url){
 
+    }
 
     async fetchAllProductsData(key) {
         return new Promise((resolve, reject) => {
@@ -31,10 +33,10 @@ class Store {
           });
     }
 
-    async updateAllProductsPrice(productId) {
+    async updateProductPriceAndStock(url, product) {
         // Generic update logic (likely overridden by subclasses)
     }
-    async updateAllProductsStock(){
+    async updateAllProductsPriceAndStock() {
 
     }
 }
