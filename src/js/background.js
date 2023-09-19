@@ -42,39 +42,22 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
 
 
 
-async function saveProductsToStorage(key, products) {
-  
-    chrome.storage.sync.set({ [key]: products }, function () {
-        console.log(`Products for ${key} saved.`);
-    });
-}
-
-
-async function loadProductsFromStorage(key) {
-    var products ={};
-    chrome.storage.sync.get([key], function (result) {
-        if (result[key]) {
-            products = result[key];
-        }
-    });
-    return products;
-}
-
 async function manageBookmarkedProduct(url, domain) {
     const key = `${domain}_products`;
+          // If we already have an instance of the store, use it. Otherwise, create a new one.
+          const StoreClass = storeClasses[domain];
+          if (!storeInstances[domain] && StoreClass) {
+              storeInstances[domain] = new StoreClass(domain);
+          }
 
     // Fetch existing products from storage
-    let existingProducts = await loadProductsFromStorage(key);
+    let existingProducts = await storeInstances[domain].fetchAllProductsData(key);
 
     // Check if the product with the same URL already exists
     let productExists = existingProducts.hasOwnProperty(url);
 
     if (!productExists) {
-        // If we already have an instance of the store, use it. Otherwise, create a new one.
-        const StoreClass = storeClasses[domain];
-        if (!storeInstances[domain] && StoreClass) {
-            storeInstances[domain] = new StoreClass(domain);
-        }
+  
 
 
 
@@ -87,9 +70,11 @@ async function manageBookmarkedProduct(url, domain) {
             additionalProductData.price,
             additionalProductData.imgUrl
         )
-
-        await saveProductsToStorage(key,existingProducts)
-
+        
+        
+        await storeInstances[domain].saveAllProductsData(key,existingProducts);
+        let products = await storeInstances[domain].fetchAllProductsData(key);
+        console.log(products);
     }
 }
 

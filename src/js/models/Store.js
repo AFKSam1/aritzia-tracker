@@ -1,31 +1,34 @@
 class Store {
     constructor(name) {
         this.name = name;
-        this.products = [];
-        this.headerObject = {};
     }
-    addProduct(product) {
-        this.products.push(product);
-    }
+  
+ 
 
-    setHeaderObject(headersObject){
-        console.log(headersObject)
-        this.headerObject = headersObject;
-        console.log("Headers were set to : ",this.headerObject);
-    }
 
-    removeProduct(productId) {
-        this.products = this.products.filter(product => product.id !== productId);
-    }
 
-    findProductById(productId) {
-        return this.products.find(product => product.id === productId);
+    async fetchAllProductsData(key) {
+        return new Promise((resolve, reject) => {
+            chrome.storage.sync.get([key], function(result) {
+              if (chrome.runtime.lastError) {
+                return reject(new Error(chrome.runtime.lastError));
+              }
+              resolve(result[key] || {});
+            });
+          });
     }
-    getAllProducts(){
-        return this.products;
-    }
-    async fetchAllProductsData(productId) {
-        // Generic fetch logic (likely overridden by subclasses)
+    
+    
+    async saveAllProductsData(key,products){
+        return new Promise((resolve, reject) => {
+            chrome.storage.sync.set({ [key]: products }, function () {
+                console.log(`Products for ${key} saved.`);
+              if (chrome.runtime.lastError) {
+                return reject(new Error(chrome.runtime.lastError));
+              }
+              resolve();
+            });
+          });
     }
 
     async updateProductPrice(productId) {
