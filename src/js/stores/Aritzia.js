@@ -3,83 +3,106 @@
 //  removeProduct(productId)
 //  findProductById(productId)
 //  getAllProducts()
-import Store from '../models/store.js';
-import Product from '../models/product.js';
+import Store from "../models/store.js";
+import Product from "../models/product.js";
 
-class Aritzia extends Store{
-    
+class Aritzia extends Store {
     constructor(name) {
         super(name);
         this.isFetching = false;
+        this.wishListId = null;
     }
 
-    async fetchAllProductsData(productId) {
-        // Generic fetch logic (likely overridden by subclasses)let header = {...this.headerObject}
 
-        let header = {...this.headerObject}
-        header['My-Custom-Header'] = 'true'; // Add a custom header
+    async fetchAllProductsData(listId) {
         this.isFetching = true;
-
-        this.products.forEach(async (product)=>{
-            const prod = this.findProductById(product.id)
-
-            const response = await fetch(product.apiUrl, {
-                method: 'GET',
-                credentials: 'include',
-                headers: header
-            });
-            
-            const data = await response.json();
-            const productData = data.wishlist[0];
-
-            console.log(data);
-            this.updateProductPrice(prod, productData)
-
-        })
-    }
-
-    async updateProductPrice(productData,productFetchedData) {
-        const currentPrice = parseFloat(productData.currentPrice.replace('$', ''));
-        const listPrice = parseFloat(productFetchedData.listPrice.replace('$', ''));
-        if(currentPrice> listPrice){
-            productData.previousPrices.push(productData.currentPrice);
-            productData.currentPrice = productFetchedData.listPrice
-        }
-        
-    }
-    async handleAddToCart(url){
-        console.log("In handleAddToCart Aritza");
-        let header = {...this.headerObject}
-        header['My-Custom-Header'] = 'true'; // Add a custom header
-        this.isFetching = true;
+        const url =
+            "https://www.aritzia.com/on/demandware.store/Sites-Aritzia_CA-Site/en_CA/Wishlist-GetWishlist?wishListID=" +
+            listId;
 
         const response = await fetch(url, {
-            method: 'GET',
-            credentials: 'include',
-            headers: header
-          });
-        const data = await response.json()
-        const productData = data.wishlist[0];
-        console.log(data.wishlist[0])
+            method: "GET",
+            credentials: "include",
+        });
 
-        const name = productData.brand + productData.description;
+        const data = await response.json();
+        // Assume that data.products is the array of products in the JSON response
+        for (let productData of data.wishlist) {
+            const existingProduct = this.findProductById(productData.pid);
 
-        const newProduct = new Product(
-            productData.pid, 
-            name, 
-            productData.listPrice, 
-            productData.imgURL, 
-            productData.prodURL,
-            url
-        )
-        this.addProduct(newProduct);
+            if (existingProduct) {
+                // Update the price if it has changed
+                this.updateProductPrice(existingProduct, productData)
+              
+            } else {
+                // Add the new product
+                const name = productData.brand + productData.description;
 
+                const newProduct = new Product(
+                    productData.pid, 
+                    name, 
+                    productData.listPrice, 
+                    productData.imgURL, 
+                    productData.prodURL,
+                    url
+                )                
+                this.addProduct(newProduct);
+            }
+        }
         this.isFetching = false;
-
-
+        chrome.runtime.sendMessage({
+            command: 'saveProductsToStorage',
+            storeName: this.name,
+            products: this.products
+        }, function(response) {
+            if (chrome.runtime.lastError) {
+                console.log("ERROR:", chrome.runtime.lastError);
+            } else {
+                console.log("RESPONSE:", response);
+            }
+        });
+        
+        console.log(this.products);
 
     }
 
+    setWishListId(wishListId) {
+        this.wishListId = wishListId;
+    }
+
+    async updateProductPrice(existingProduct, productFetchedData) {
+        const currentPrice = parseFloat(existingProduct.currentPrice.replace("$", ""));
+        const fetchedPrice = parseFloat(productFetchedData.listPrice.replace("$", ""));
+    
+        if (currentPrice > fetchedPrice) {
+            existingProduct.previousPrices.push(existingProduct.currentPrice);
+            existingProduct.updatePrice(productFetchedData.listPrice);
+        }
+    }
+
+    async handleAddToCart(url) {
+        this.isFetching = true;
+
+        if (this.wishListId == null) {
+            console.log("In handleAddToCart Aritza");
+            let header = { ...this.headerObject };
+            header["My-Custom-Header"] = "true"; // Add a custom header
+
+            const response = await fetch(url, {
+                method: "GET",
+                credentials: "include",
+                headers: header,
+            });
+            const data = await response.json();
+            
+            this.setWishListId(data.wishlistID);
+            this.fetchAllProductsData(this.wishListId);
+
+        } else {
+            this.fetchAllProductsData(this.wishListId);
+        }
+    this.isFetching=false;
+    }
 }
 
 export default Aritzia;
