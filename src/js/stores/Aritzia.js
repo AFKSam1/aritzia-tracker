@@ -9,8 +9,6 @@ import Product from "../models/product.js";
 class Aritzia extends Store {
     constructor(name) {
         super(name);
-        this.isFetching = false;
-        this.wishListId = null;
     }
 
 

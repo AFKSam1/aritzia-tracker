@@ -3,17 +3,62 @@
 
 <head>
   <title>Product Info</title>
-  <link rel="stylesheet" href="./output.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 12px;
+      text-align: center;
+      display: inline-block;
+      margin: 8px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .product-list {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .product-card {
+      width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 8px;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .product-img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    h2 {
+      font-size: 1.5em;
+      margin-bottom: 0.5em;
+    }
+  </style>
 </head>
 
-<body class="bg-gray-100">
+<body>
+  <h1>Product Info</h1>
   <button id="bookmarkButton">Bookmark this Page</button>
-  <button id="clear-data">Clear  Product Data</button>
-  <div id="product-list" class="p-4">
+  <button id="clear-data">Clear Product Data</button>
+  <button id="fetchDataBtn">Fetch Products</button>
+  <div id="product-list" class="product-list">
     <!-- Products will be displayed here -->
   </div>
   <script type="module" src="./popup.js"></script>
-  <h1>Testing</h1>
 </body>
 
 </html>

@@ -1,83 +1,72 @@
 // background.js
 import Product from "./models/product.js";
 import Aritzia from "./stores/aritzia.js";
-import createHeadersObject from "./utils/helpers.js";
+import helpers from "./utils/helpers.js";
 
 const storeClasses = {
     aritzia: Aritzia,
-};
-const storeConfig = {
-    aritzia: {
-        addToCartURL: "mylist/add",
-        myListUrl: "/Wishlist-GetWishlist?wishListID=",
-        wishListId: "wishListID",
-    },
-    "anotherstore.com": {
-        addToCartURL: "cart/add",
-    },
+    // add more stores here
 };
 
 const storeInstances = {};
 
-
-
-
+for (const [domain, StoreClass] of Object.entries(storeClasses)) {
+    storeInstances[domain] = new StoreClass(domain);
+}
 
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-    if (request.command === 'clearChromeStorage') {
-        chrome.storage.sync.clear(function() {
-            console.log('Storage is cleared.');
+    if (request.command === "clearChromeStorage") {
+        chrome.storage.sync.clear(function () {
+            console.log("Storage is cleared.");
         });
-
-    } else if (request.command === 'bookmarkPage') {
-        console.log("In here b")
-        console.log(request.url)
+    } else if (request.command === "bookmarkPage") {
+        console.log("In here b");
+        console.log(request.url);
 
         const url = new URL(request.url);
-        const domain = url.hostname.split(".")[1]; // Extract base domain
+        const domain = helpers.extractBaseDomain(url);
 
         await manageBookmarkedProduct(request.url, domain);
+    } else if (request.command === "fetchAllProducts") {
+      
     }
 });
 
 
-
 async function manageBookmarkedProduct(url, domain) {
-    const key = `${domain}_products`;
-          // If we already have an instance of the store, use it. Otherwise, create a new one.
-          const StoreClass = storeClasses[domain];
-          if (!storeInstances[domain] && StoreClass) {
-              storeInstances[domain] = new StoreClass(domain);
-          }
+    try {
+        const key = `${domain}_products`;
 
-    // Fetch existing products from storage
-    let existingProducts = await storeInstances[domain].fetchAllProductsData(key);
+        if (!storeClasses[domain]) {
+            console.error(`No store class found for domain: ${domain}`);
+            return;
+        }
 
-    // Check if the product with the same URL already exists
-    let productExists = existingProducts.hasOwnProperty(url);
+        if (!storeInstances[domain]) {
+            storeInstances[domain] = new storeClasses[domain](domain);
+        }
 
-    if (!productExists) {
-  
+        let existingProducts = await storeInstances[domain].fetchAllProductsData(key);
 
+        if (!existingProducts.hasOwnProperty(url)) {
+            const additionalProductData = await fetchAdditionalProductData(url, domain);
 
+            existingProducts[url] = new Product(
+                additionalProductData.title,
+                additionalProductData.description,
+                additionalProductData.price,
+                additionalProductData.imgUrl
+            );
 
-        const additionalProductData = await fetchAdditionalProductData(url,domain);
+            await storeInstances[domain].saveAllProductsData(key, existingProducts);
+            let products = await storeInstances[domain].fetchAllProductsData(key);
 
-        // Add new product with initial data
-        existingProducts[url] = new Product(
-            additionalProductData.title,
-            additionalProductData.description,
-            additionalProductData.price,
-            additionalProductData.imgUrl
-        )
-        
-        
-        await storeInstances[domain].saveAllProductsData(key,existingProducts);
-        let products = await storeInstances[domain].fetchAllProductsData(key);
-        console.log(products);
+            console.log(`The store: ${domain} contains these products:`, products);
+        }
+    } catch (error) {
+        console.error(`An error occurred while managing the bookmarked product: ${error}`);
     }
 }
-
 
 async function fetchAdditionalProductData(url, domain) {
     const response = await fetch(url);
@@ -85,20 +74,23 @@ async function fetchAdditionalProductData(url, domain) {
 
     return new Promise((resolve, reject) => {
         chrome.tabs.query({ active: true }, function (tabs) {
-            const aritziaTab = tabs.find(tab => tab.url.includes("aritzia.com"));
+            const aritziaTab = tabs.find((tab) => tab.url.includes("aritzia.com"));
 
             if (!aritziaTab) {
                 return reject(new Error("No matching tab found"));
             }
 
-            chrome.tabs.sendMessage(aritziaTab.id, { action: 'parseHtml', htmlText: htmlText, domain: domain }, function (response) {
-                if (chrome.runtime.lastError) {
-                    return reject(new Error(chrome.runtime.lastError));
-                }
+            chrome.tabs.sendMessage(
+                aritziaTab.id,
+                { action: "parseHtml", htmlText: htmlText, domain: domain },
+                function (response) {
+                    if (chrome.runtime.lastError) {
+                        return reject(new Error(chrome.runtime.lastError));
+                    }
 
-                resolve(response.parsedData);
-            });
+                    resolve(response.parsedData);
+                }
+            );
         });
     });
 }
-
