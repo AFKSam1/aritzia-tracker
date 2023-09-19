@@ -26,63 +26,9 @@ class Aritzia extends Store {
         //return additionalProductData;
     }
 
-    parseHtml(doc) {
-        console.log(doc);
-        const title = doc.querySelector('.f1').textContent;
-        console.log(title)
-        // Aritzia-specific DOM parsing logic
-        return { title };
-    }
+
     async fetchAllProductsData(listId) {
-        this.isFetching = true;
-        const url =
-            "https://www.aritzia.com/on/demandware.store/Sites-Aritzia_CA-Site/en_CA/Wishlist-GetWishlist?wishListID=" +
-            listId;
-
-        const response = await fetch(url, {
-            method: "GET",
-            credentials: "include",
-        });
-
-        const data = await response.json();
-        // Assume that data.products is the array of products in the JSON response
-        for (let productData of data.wishlist) {
-            const existingProduct = this.findProductById(productData.pid);
-
-            if (existingProduct) {
-                // Update the price if it has changed
-                this.updateProductPrice(existingProduct, productData)
-
-            } else {
-                // Add the new product
-                const name = productData.brand + productData.description;
-
-                const newProduct = new Product(
-                    productData.pid,
-                    name,
-                    productData.listPrice,
-                    productData.imgURL,
-                    productData.prodURL,
-                    url
-                )
-                this.addProduct(newProduct);
-            }
-        }
-        this.isFetching = false;
-        chrome.runtime.sendMessage({
-            command: 'saveProductsToStorage',
-            storeName: this.name,
-            products: this.products
-        }, function (response) {
-            if (chrome.runtime.lastError) {
-                console.log("ERROR:", chrome.runtime.lastError);
-            } else {
-                console.log("RESPONSE:", response);
-            }
-        });
-
-        console.log(this.products);
-
+ 
     }
 
     setWishListId(wishListId) {

@@ -1,4 +1,5 @@
 // background.js
+import Product from "./models/product.js";
 import Aritzia from "./stores/aritzia.js";
 import createHeadersObject from "./utils/helpers.js";
 
@@ -23,17 +24,11 @@ const storeInstances = {};
 
 
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-    if (request.command === 'fetchAllProductsData') {
-        const storeInstance = storeInstances[request.storeName];
-        if (storeInstance) {
-            await storeInstance.fetchAllProductsData();
-            sendResponse({ success: true });
-        } else {
-            sendResponse({ success: false });
-        }
-    } else if (request.command === 'saveProductsToStorage') {
-        saveProductsToStorage(request.storeName, request.products);
-        sendResponse({ success: true });
+    if (request.command === 'clearChromeStorage') {
+        chrome.storage.sync.clear(function() {
+            console.log('Storage is cleared.');
+        });
+
     } else if (request.command === 'bookmarkPage') {
         console.log("In here b")
         console.log(request.url)
@@ -47,37 +42,29 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
 
 
 
-async function saveProductsToStorage(storeName, products) {
-    const key = `${storeName}_products`;
+async function saveProductsToStorage(key, products) {
+  
     chrome.storage.sync.set({ [key]: products }, function () {
-        console.log(`Products for ${storeName} saved.`);
+        console.log(`Products for ${key} saved.`);
     });
 }
 
 
-async function loadProductsFromStorage(storeName, storeInstance) {
-    const key = `${storeName}_products`;
+async function loadProductsFromStorage(key) {
+    var products ={};
     chrome.storage.sync.get([key], function (result) {
         if (result[key]) {
-            storeInstance.products = result[key];
+            products = result[key];
         }
     });
+    return products;
 }
-// ... (existing imports and setup)
 
 async function manageBookmarkedProduct(url, domain) {
     const key = `${domain}_products`;
-    let existingProducts = {};
 
     // Fetch existing products from storage
-    await new Promise((resolve) => {
-        chrome.storage.sync.get([key], (result) => {
-            if (result[key]) {
-                existingProducts = result[key];
-            }
-            resolve();
-        });
-    });
+    let existingProducts = await loadProductsFromStorage(key);
 
     // Check if the product with the same URL already exists
     let productExists = existingProducts.hasOwnProperty(url);
@@ -89,25 +76,20 @@ async function manageBookmarkedProduct(url, domain) {
             storeInstances[domain] = new StoreClass(domain);
         }
 
-        // Fetch additional product data from URL
 
 
-        const additionalProductData = await fetchAdditionalProductData(url);
+        const additionalProductData = await fetchAdditionalProductData(url,domain);
 
         // Add new product with initial data
-        existingProducts[url] = {
-            prices: [],
-            // Add other fetched product properties as needed
-            ...additionalProductData,
-        };
+        existingProducts[url] = new Product(
+            additionalProductData.title,
+            additionalProductData.description,
+            additionalProductData.price,
+            additionalProductData.imgUrl
+        )
 
-        // Save updated product dictionary back to storage
-        await new Promise((resolve) => {
-            chrome.storage.sync.set({ [key]: existingProducts }, () => {
-                console.log(`Product for ${domain} saved.`);
-                resolve();
-            });
-        });
+        await saveProductsToStorage(key,existingProducts)
+
     }
 }
 
@@ -116,12 +98,21 @@ async function fetchAdditionalProductData(url, domain) {
     const response = await fetch(url);
     const htmlText = await response.text();
 
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        const tab = tabs[0];
-        chrome.tabs.sendMessage(tab.id, { action: 'parseHtml', htmlText: htmlText, domain: domain }, function (response) {
-            console.log(response);
-            console.log(response.toString())
-            console.log(response.text());
+    return new Promise((resolve, reject) => {
+        chrome.tabs.query({ active: true }, function (tabs) {
+            const aritziaTab = tabs.find(tab => tab.url.includes("aritzia.com"));
+
+            if (!aritziaTab) {
+                return reject(new Error("No matching tab found"));
+            }
+
+            chrome.tabs.sendMessage(aritziaTab.id, { action: 'parseHtml', htmlText: htmlText, domain: domain }, function (response) {
+                if (chrome.runtime.lastError) {
+                    return reject(new Error(chrome.runtime.lastError));
+                }
+
+                resolve(response.parsedData);
+            });
         });
     });
 }

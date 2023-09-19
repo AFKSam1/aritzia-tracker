@@ -1,14 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const fetchDataButton = document.getElementById('fetch-data');
+  const fetchDataButton = document.getElementById('clear-data');
 
   fetchDataButton.addEventListener('click', () => {
     chrome.runtime.sendMessage(
-      { command: 'fetchAllProductsData', storeName: 'aritzia' },
+      { command: 'clearChromeStorage', storeName: 'aritzia' },
       (response) => {
         if (response.success) {
-          console.log('Data fetched successfully');
+          console.log('clearChromeStorage success');
         } else {
-          console.log('Data fetch failed');
+          console.log('clearChromeStorage failed');
         }
       }
     );
