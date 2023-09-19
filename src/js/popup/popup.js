@@ -57,18 +57,18 @@ document.addEventListener('DOMContentLoaded', () => {
                   const titleElement = document.createElement("h2");
                   titleElement.innerText = product.name;
   
-                  const descElement = document.createElement("p");
-                  descElement.innerText = product.description;
+                //   const descElement = document.createElement("p");
+                //   descElement.innerText = product.description;
   
-                  const priceElement = document.createElement("p");
+                  const priceElement = document.createElement("h4");
                   priceElement.innerText = `Current Price: ${product.currentPrice}`;
   
-                  const prevPriceElement = document.createElement("p");
+                  const prevPriceElement = document.createElement("h4");
                   prevPriceElement.innerText = `Previous Prices: ${product.previousPrices.join(', ')}`;
   
                   productCard.appendChild(imgElement);
                   productCard.appendChild(titleElement);
-                  productCard.appendChild(descElement);
+                  //productCard.appendChild(descElement);
                   productCard.appendChild(priceElement);
                   productCard.appendChild(prevPriceElement);
   

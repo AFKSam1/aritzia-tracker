@@ -25,6 +25,37 @@ const parsers = {
         if (stockInfo) {
             parsedData.stockInfo = stockInfo.getAttribute("content");
         }
+        // Get all the 'li' elements with the class 'ar-dropdown__option' from the document
+        const listItems = document.querySelectorAll('.ar-dropdown__option');
+
+        // Initialize an array to hold sizes and inventory statuses
+        const sizeInfo = [];
+
+        // Loop through each 'li' element
+        listItems.forEach((item) => {
+        // Find the 'span' with class 'f1' inside each 'li'
+        const sizeSpan = item.querySelector('.f1');
+
+        // Find the 'span' with class 'js-size-dropdown__inventory-status' inside each 'li'
+        const inventorySpan = item.querySelector('.js-size-dropdown__inventory-status');
+
+        // If both 'span' elements exist, capture their text content
+        if (sizeSpan && sizeSpan.textContent && inventorySpan) {
+            const size = sizeSpan.textContent.trim();
+            var inventoryStatus = inventorySpan.textContent.trim();
+            if(inventoryStatus == ''){
+                inventoryStatus = "In Stock";
+            }
+
+            // Store the size and its inventory status in an object, and add it to the array
+            sizeInfo.push({ size, inventoryStatus });
+        }
+        });
+
+        // Log the sizes array to the console
+        console.log(sizeInfo);
+        parsedData.sizes = sizeInfo;
+
 
         console.log(parsedData);
         return parsedData;

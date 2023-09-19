@@ -1,0 +1,55 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    width: 800px; /* Set the width to the maximum width allowed */
+    height: 600px; /* Set the height to the maximum height allowed */
+  }
+  
+  button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px;
+    text-align: center;
+    display: inline-block;
+    margin: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  
+  .product-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centers the cards horizontally */
+  }
+  
+  .product-card {
+    display: flex;
+    align-items: flex-start;
+    width: 90%; /* or you can set a fixed width like 400px */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 8px;
+    margin: 8px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    justify-content: space-around;
+  }
+  
+  .product-img {
+    width: 50px;
+    height: auto;
+    margin-right: 10px;
+  }
+  
+  .product-info {
+    flex: 1;
+  }
+  
+  h2 {
+    font-size: 1.2em;
+    margin-bottom: 0.5em;
+  }
+  

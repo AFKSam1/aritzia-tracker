@@ -55,6 +55,7 @@ async function manageBookmarkedProduct(url, domain) {
                 additionalProductData.title,
                 additionalProductData.description,
                 additionalProductData.price,
+                additionalProductData.sizes,
                 additionalProductData.imgUrl
             );
 
@@ -64,7 +65,9 @@ async function manageBookmarkedProduct(url, domain) {
             console.log(`The store: ${domain} contains these products:`, products);
         }
     } catch (error) {
-        console.error(`An error occurred while managing the bookmarked product: ${error}`);
+        console.error(`An error occurred while managing the bookmarked product:`,error);
+        console.log(error);  // Log the full error object
+
     }
 }
 
