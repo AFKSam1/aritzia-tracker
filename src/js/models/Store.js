@@ -31,8 +31,11 @@ class Store {
           });
     }
 
-    async updateProductPrice(productId) {
+    async updateAllProductsPrice(productId) {
         // Generic update logic (likely overridden by subclasses)
+    }
+    async updateAllProductsStock(){
+
     }
 }
 export default Store;

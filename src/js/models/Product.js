@@ -9,7 +9,7 @@ class Product {
         this.imgUrl = imgUrl;
         //this.productUrl = productUrl;
         //this.sourceUrl = sourceUrl;
-        this.previousPrices = [currentPrice];
+        this.priceWhenAdded = currentPrice;
         //this.apiUrl = apiUrl;
     }
 }

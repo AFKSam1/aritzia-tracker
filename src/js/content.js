@@ -23,7 +23,7 @@ const parsers = {
         }
 
         // Get all the 'li' elements with the class 'ar-dropdown__option' from the document
-        const listItems = document.querySelectorAll('.ar-dropdown__option');
+        const listItems = doc.querySelectorAll('.ar-dropdown__option');
 
         // Initialize an array to hold sizes and inventory statuses
         const stockInfo = [];
