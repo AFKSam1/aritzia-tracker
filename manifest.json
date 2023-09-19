@@ -1,19 +1,27 @@
 {
-    "manifest_version": 3,
-    "name": "Price Drop Tracker",
-    "version": "1.0.0",
-    "description": "Tracks price drops of shopping cart items on different stores.",
-    "permissions": ["webRequest","webRequestBlocking","tabs","webNavigation","scripting","activeTab"],
-    "host_permissions": [
-      "http://*/*",
-      "https://*/*"
-    ],
-    "background": {
-      "service_worker": "./src/js/background.js",
-      "type":"module"
-    },
-    "action": {
-      "default_popup": "./src/js/popup/popup.html"
-    }
+  "manifest_version": 3,
+  "name": "Price Drop Tracker",
+  "version": "1.0.0",
+  "description": "Tracks price drops of shopping cart items on different stores.",
+  "permissions": [
+    "storage",
+    "webRequest",
+    "webRequestBlocking",
+    "tabs",
+    "webNavigation",
+    "scripting",
+    "activeTab",
+    "alarms"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "background": {
+    "service_worker": "./src/js/background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "./src/js/popup/popup.html"
   }
-  
+}
