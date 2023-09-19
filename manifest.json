@@ -21,6 +21,16 @@
     "service_worker": "./src/js/background.js",
     "type": "module"
   },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "./src/js/content.js"
+      ]
+    }
+  ],
   "action": {
     "default_popup": "./src/js/popup/popup.html"
   }

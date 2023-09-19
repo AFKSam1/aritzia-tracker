@@ -63,7 +63,7 @@ async function loadProductsFromStorage(storeName, storeInstance) {
         }
     });
 }
-
+// ... (existing imports and setup)
 
 async function manageBookmarkedProduct(url, domain) {
     const key = `${domain}_products`;
@@ -82,12 +82,23 @@ async function manageBookmarkedProduct(url, domain) {
     // Check if the product with the same URL already exists
     let productExists = existingProducts.hasOwnProperty(url);
 
-
     if (!productExists) {
+        // If we already have an instance of the store, use it. Otherwise, create a new one.
+        const StoreClass = storeClasses[domain];
+        if (!storeInstances[domain] && StoreClass) {
+            storeInstances[domain] = new StoreClass(domain);
+        }
+
+        // Fetch additional product data from URL
+
+
+        const additionalProductData = await fetchAdditionalProductData(url);
+
         // Add new product with initial data
         existingProducts[url] = {
-            prices: [],  // Initialize with an empty array to hold prices
-            // Add other product properties as needed
+            prices: [],
+            // Add other fetched product properties as needed
+            ...additionalProductData,
         };
 
         // Save updated product dictionary back to storage
@@ -99,3 +110,19 @@ async function manageBookmarkedProduct(url, domain) {
         });
     }
 }
+
+
+async function fetchAdditionalProductData(url, domain) {
+    const response = await fetch(url);
+    const htmlText = await response.text();
+
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        const tab = tabs[0];
+        chrome.tabs.sendMessage(tab.id, { action: 'parseHtml', htmlText: htmlText, domain: domain }, function (response) {
+            console.log(response);
+            console.log(response.toString())
+            console.log(response.text());
+        });
+    });
+}
+
