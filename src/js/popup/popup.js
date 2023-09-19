@@ -57,8 +57,8 @@ document.addEventListener('DOMContentLoaded', () => {
                   const titleElement = document.createElement("h2");
                   titleElement.innerText = product.name;
   
-                //   const descElement = document.createElement("p");
-                //   descElement.innerText = product.description;
+
+                  
   
                   const priceElement = document.createElement("h4");
                   priceElement.innerText = `Current Price: ${product.currentPrice}`;
@@ -71,6 +71,26 @@ document.addEventListener('DOMContentLoaded', () => {
                   //productCard.appendChild(descElement);
                   productCard.appendChild(priceElement);
                   productCard.appendChild(prevPriceElement);
+
+                  const stockDropdown = document.createElement("select");
+                stockDropdown.className = "stock-dropdown";
+
+                const defaultOption = document.createElement("option");
+                defaultOption.text = "Check Stock";
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                stockDropdown.appendChild(defaultOption);
+
+                product.stockInfo.forEach(stockItem => {
+                    const stockOption = document.createElement("option");
+                    stockOption.text = `${stockItem.size} - ${stockItem.inventoryStatus}`;
+                    stockDropdown.appendChild(stockOption);
+                });
+
+                productCard.appendChild(stockDropdown); // Append stock dropdown to product card
+
+                productListDiv.appendChild(productCard);
+                  
   
                   productListDiv.appendChild(productCard);
               }

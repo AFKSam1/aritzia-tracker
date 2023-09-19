@@ -21,15 +21,12 @@ const parsers = {
         if (imgUrl) {
             parsedData.imgUrl = imgUrl.getAttribute("content");
         }
-        const stockInfo = doc.querySelector("meta[property='og:availability']");
-        if (stockInfo) {
-            parsedData.stockInfo = stockInfo.getAttribute("content");
-        }
+
         // Get all the 'li' elements with the class 'ar-dropdown__option' from the document
         const listItems = document.querySelectorAll('.ar-dropdown__option');
 
         // Initialize an array to hold sizes and inventory statuses
-        const sizeInfo = [];
+        const stockInfo = [];
 
         // Loop through each 'li' element
         listItems.forEach((item) => {
@@ -48,13 +45,13 @@ const parsers = {
             }
 
             // Store the size and its inventory status in an object, and add it to the array
-            sizeInfo.push({ size, inventoryStatus });
+            stockInfo.push({ size, inventoryStatus });
         }
         });
 
         // Log the sizes array to the console
-        console.log(sizeInfo);
-        parsedData.sizes = sizeInfo;
+        console.log(stockInfo);
+        parsedData.stockInfo = stockInfo;
 
 
         console.log(parsedData);

@@ -55,7 +55,7 @@ async function manageBookmarkedProduct(url, domain) {
                 additionalProductData.title,
                 additionalProductData.description,
                 additionalProductData.price,
-                additionalProductData.sizes,
+                additionalProductData.stockInfo,
                 additionalProductData.imgUrl
             );
 
