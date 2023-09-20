@@ -18,7 +18,7 @@ export function extractBaseDomain(url) {
         return hostname;
     }
 
-    if (hostnameParts[0] === "www") {
+    if (hostnameParts[0] === "www"  || hostnameParts[0] === "m") {
         // If "www" is present, return the second part
         return hostnameParts[1];
     } else {

@@ -89,6 +89,56 @@ const parsers = {
         console.log(parsedData);
         return parsedData;
     },
+    simons: function(doc){
+        let parsedData = {};
+
+        // Find the element with class "selected" and extract its data-product-color-id attribute
+        const selectedColorElement = doc.querySelector('.single-product-color.js-color.selected');
+        if (selectedColorElement) {
+            parsedData.productColorId = selectedColorElement.getAttribute('data-product-color-id');
+        }
+
+        // Find and extract the script content
+        const scriptContent = Array.from(doc.querySelectorAll('script'))
+            .map(el => el.textContent)
+            .join('\n');
+        
+        const regex = /product\.maxStocks\s*=\s*(\{[\s\S]*?\});/;  // Regular expression to match product.maxStocks
+        const match = scriptContent.match(regex);
+        const regex2 = /product\.sizesEn\s*=\s*(\{[\s\S]*?\});/;  // Regular expression to match product.sizesEn
+        const match2 = scriptContent.match(regex2);
+        var sizesEn;
+
+        if(match2 && match2[1]){
+            sizesEn = JSON.parse(match2[1]);
+            console.log(sizesEn)
+        }
+
+        if (match && match[1]) {
+            const maxStocks = JSON.parse(match[1]);
+            console.log("max stocks:",maxStocks);
+            var mapped = mapColorsToStocks(doc,maxStocks,sizesEn);
+        console.log("mapped :",mapped);
+        }
+        parsedData.stockInfo = mapped;
+
+        const imgUrl = doc.querySelector("meta[itemprop='image']");
+        if (imgUrl) {
+            parsedData.imgUrl = imgUrl.getAttribute("content");
+        }
+        const titleElement = doc.querySelector("meta[itemprop='name']");
+        if (titleElement) {
+            parsedData.title = titleElement.getAttribute("content");
+        }
+        const price = doc.querySelector(".single-product-price");
+        if(price){
+            parsedData.price = parseFloat(price.innerText)
+        }
+
+    
+        console.log(parsedData);
+        return parsedData;
+    },
     // ...
 };
 
@@ -106,4 +156,32 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 function parseDomainHtml(domain, doc) {
     const parser = parsers[domain];
     return parser(doc);
+}
+
+function mapColorsToStocks(doc, maxStocks,sizesEn) {
+    const colorStockMap = {}; // Object to hold the mapping between color names and their stocks
+
+    // Iterate over each color element in the DOM
+    const colorElements = doc.querySelectorAll('.single-product-color.backup-color.js-color');
+    colorElements.forEach((element) => {
+        const colorName = element.getAttribute('title'); // Get the color name from the title attribute
+        const colorId = element.getAttribute('data-product-color-id'); // Get the color ID
+
+        // Create an object to hold the stocks of each size for this color
+        const colorStocks = {};
+        
+        // Iterate over the maxStocks object to find the stocks that belong to this color
+        for (const [key, value] of Object.entries(maxStocks)) {
+            const [stockColorId, sizeCode] = key.split(':'); // Split the key to get the color ID and size code
+            if (stockColorId === colorId) {
+                const sizeName = sizesEn[sizeCode] || sizeCode; // Get the size name, or use the code if the name is not found
+                colorStocks[sizeName] = value; // Add this size and its stock to the colorStocks object
+            }
+        }
+
+        // Add this color and its stocks to the colorStockMap object
+        colorStockMap[colorName] = colorStocks;
+    });
+
+    return colorStockMap; // Return the mapping
 }

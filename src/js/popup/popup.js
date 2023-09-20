@@ -1,5 +1,8 @@
 //popup.js
 import Aritzia from "../stores/aritzia.js";
+import Simons from "../stores/Simons.js";
+import Primitiveskate from "../stores/Primitiveskate.js";
+
 
 document.addEventListener("DOMContentLoaded", () => {
     const clearDataBtn = document.getElementById("clear-data");
@@ -34,63 +37,71 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchDataBtn.addEventListener("click", () => {
         chrome.storage.sync.get(null, (allData) => {
             const productListDiv = document.getElementById("product-list");
-
+    
             // Clear existing content if any
             productListDiv.innerHTML = "";
-
+    
             for (const [key, products] of Object.entries(allData)) {
                 const domain = key.replace("_products", "");
                 const domainDiv = document.createElement("h3");
                 domainDiv.innerText = `Products from ${domain}:`;
                 productListDiv.appendChild(domainDiv);
-
+    
                 for (const [url, product] of Object.entries(products)) {
                     const productCard = document.createElement("div");
                     productCard.className = "product-card";
-
+    
                     const imgElement = document.createElement("img");
                     imgElement.src = product.imgUrl;
                     imgElement.alt = product.name;
                     imgElement.className = "product-img";
-
+    
                     const titleElement = document.createElement("h2");
                     titleElement.innerText = product.name;
-
+    
                     const priceElement = document.createElement("h4");
                     priceElement.innerText = `Current Price: ${product.currentPrice}`;
-
+    
                     const prevPriceElement = document.createElement("h4");
                     prevPriceElement.innerText = `Price when added to the list: ${product.priceWhenAdded}`;
-
+    
                     productCard.appendChild(imgElement);
                     productCard.appendChild(titleElement);
-                    //productCard.appendChild(descElement);
                     productCard.appendChild(priceElement);
                     productCard.appendChild(prevPriceElement);
-
+    
                     const stockDropdown = document.createElement("select");
                     stockDropdown.className = "stock-dropdown";
-
+    
                     const defaultOption = document.createElement("option");
                     defaultOption.text = "Check Stock";
                     defaultOption.disabled = true;
                     defaultOption.selected = true;
                     stockDropdown.appendChild(defaultOption);
-
-                    product.stockInfo.forEach((stockItem) => {
-                        const stockOption = document.createElement("option");
-                        stockOption.text = `${stockItem.size} - ${stockItem.inventoryStatus}`;
-                        stockDropdown.appendChild(stockOption);
-                    });
-
+    
+                    if (Array.isArray(product.stockInfo)) {
+                        product.stockInfo.forEach((stockItem) => {
+                            const stockOption = document.createElement("option");
+                            stockOption.text = `${stockItem.size} - ${stockItem.inventoryStatus}`;
+                            stockDropdown.appendChild(stockOption);
+                        });
+                    } else {  // Simons case
+                        for (const [color, sizes] of Object.entries(product.stockInfo)) {
+                            for (const [size, stock] of Object.entries(sizes)) {
+                                const stockOption = document.createElement("option");
+                                stockOption.text = `${color} - ${size} - ${stock > 0 ? 'In Stock' : 'Out of Stock'}`;
+                                stockDropdown.appendChild(stockOption);
+                            }
+                        }
+                    }
+    
                     productCard.appendChild(stockDropdown); // Append stock dropdown to product card
-
                     productListDiv.appendChild(productCard);
-
                 }
             }
         });
     });
+    
 
     const updateAllPricesBtn = document.getElementById("updateAllPricesBtn");
     const aritziaStore = new Aritzia("aritzia"); // Assuming you've imported and instantiated Aritzia

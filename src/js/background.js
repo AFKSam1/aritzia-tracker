@@ -2,6 +2,8 @@
 import Product from "./models/product.js";
 import Aritzia from "./stores/aritzia.js";
 import Primitiveskate from "./stores/Primitiveskate.js";
+import Simons from "./stores/Simons.js";
+
 import helpers from "./utils/helpers.js";
 
 // Initialize store classes and instances
@@ -139,6 +141,7 @@ function initializeStoreClasses() {
     return {
         aritzia: Aritzia,
         primitiveskate:Primitiveskate,
+        simons:Simons,
         // add more stores here
     };
 }
