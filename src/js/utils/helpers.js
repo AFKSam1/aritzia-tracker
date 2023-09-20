@@ -35,10 +35,19 @@ export function centsToDollars(cents) {
     return dollars.toFixed(2);
 }
 
+ export async function urlToDomParser(url) {
+    const response = await fetch(url);
+    const htmlText = await response.text();
+    let parser = new DOMParser();
+    const doc = parser.parseFromString(htmlText, "text/html");
+    return doc;
+}
+
 const allFunctions = {
     createHeadersObject,
     extractBaseDomain,
     centsToDollars,
+    urlToDomParser,
 };
 
 export default allFunctions;

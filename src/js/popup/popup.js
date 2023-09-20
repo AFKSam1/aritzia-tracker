@@ -4,6 +4,8 @@ import Simons from "../stores/Simons.js";
 import Primitiveskate from "../stores/Primitiveskate.js";
 import ProductUpdater from "../services/ProductUpdater.js"
 import initializeStoreClasses from "../stores/storeConfig.js";
+import helpers from "../utils/helpers.js";
+
 
 const supportedStores = Object.keys(initializeStoreClasses.initializeStoreClasses());
 
@@ -23,17 +25,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const bookmarkButton = document.getElementById("bookmarkButton");
 
   bookmarkButton.addEventListener("click", () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+
+
+    chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
       const currentTab = tabs[0];
       if (currentTab) {
-        // Send message to background script
-        chrome.runtime.sendMessage({
-          command: "bookmarkPage",
-          url: currentTab.url,
-        });
+        ProductUpdater
+          .handleBookmarkPage(currentTab.url)
+          .then(() => {
+            console.log("Product saved successfulllyyy");
+          }).catch((error) => {
+            console.log("Errror saving product")
+          })
       }
     });
   });
+
+
+
 
   const fetchDataBtn = document.getElementById("fetchDataBtn");
 

@@ -10,11 +10,26 @@ class Aritzia extends Store {
         super();
     }
 
+
+    static async fetchProduct(url) {
+        const doc = await this.urlToDomParser(url);
+
+        const parsedData = this.extractMetaData(doc, [
+            { property: "og:title", key: "title" },
+            { property: "og:price:amount", key: "price" },
+            { property: "og:description", key: "description" },
+            { property: "og:image", key: "imgUrl" }
+        ]);
+
+        parsedData.stockInfo = this.extractStockInfoAritzia(doc);
+        return parsedData;
+    }
+
     static async fetchPriceAndStock(url) {
         let data = {};
-       
+
         const doc = await this.urlToDomParser(url);
-    
+
 
         const priceElement = doc.querySelector("meta[property='og:price:amount']");
         if (priceElement) {
@@ -58,37 +73,48 @@ class Aritzia extends Store {
             const newProductData = await this.fetchPriceAndStock(url);
 
             // Fetch existing products from 'aritzia_products'
-            const existingProduct = await Store.getProductDataFromChromeStorage(storeName, url);
+            const existingProduct = await this.getProductDataFromChromeStorage(storeName, url);
 
 
             // Create updated product object
             const updatedProduct = { ...existingProduct, currentPrice: newProductData.price, stockInfo: newProductData.stockInfo };
 
 
-            await Store.setProductDataChromeStorage(storeName, url, updatedProduct);
+            await this.saveProductToChromeStorage(storeName, url, updatedProduct);
 
         } catch (error) {
             console.error("Error updating product price:", error);
         }
     }
 
-    // static async updateAllProductsPriceAndStock() {
-    // try {
-    //     // Fetch the list of URLs for the given store
-    //     const urls = await this.fetchUrlsForStore(storeName);  // You'll need to implement this method
 
-    //     // Update each product one by one
-    //     for (const url of urls) {
-    //         await this.updateProductPriceAndStock(storeName, url);
-    //     }
-    // } catch (error) {
-    //     console.error("Error updating all product prices:", error);
-    // }
-    //}
+    static extractMetaData(doc, metaList, attribute = "property") {
+        return metaList.reduce((acc, { property, key, itemprop }) => {
+            const element = doc.querySelector(`meta[${attribute}='${property || itemprop}']`);
+            if (element) {
+                acc[key] = element.getAttribute("content");
+            }
+            return acc;
+        }, {});
+    }
 
-    
 
-    
+
+    static extractStockInfoAritzia(doc) {
+        return Array.from(doc.querySelectorAll(".ar-dropdown__option")).map(item => {
+            const sizeSpan = item.querySelector(".f1");
+            const inventorySpan = item.querySelector(".js-size-dropdown__inventory-status");
+            if (sizeSpan && inventorySpan) {
+                const size = sizeSpan.textContent.trim();
+                let inventoryStatus = inventorySpan.textContent.trim() || "In Stock";
+                return { size, inventoryStatus };
+            }
+            return null;
+        }).filter(Boolean);
+    }
+
+
+
 }
 
 export default Aritzia;

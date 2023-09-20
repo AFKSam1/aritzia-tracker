@@ -21,9 +21,11 @@ class Store {
         });
     }
 
-    static async fetchPriceAndStock(url) { }
+    static async fetchPriceAndStock(url) {
+        throw new Error("This method must be overridden by subclass");
+    }
 
-    static async fetchAllProductsData(key) {
+    static async getAllProductsDataFromChromeStorage(key) {
         return new Promise((resolve, reject) => {
             chrome.storage.sync.get([key], function (result) {
                 if (chrome.runtime.lastError) {
@@ -34,17 +36,6 @@ class Store {
         });
     }
 
-    static async saveAllProductsData(key, products) {
-        return new Promise((resolve, reject) => {
-            chrome.storage.sync.set({ [key]: products }, function () {
-                console.log(`Products for ${key} saved.`);
-                if (chrome.runtime.lastError) {
-                    return reject(new Error(chrome.runtime.lastError));
-                }
-                resolve();
-            });
-        });
-    }
 
     static async getProductDataFromChromeStorage(storeName, url) {
         const key = `${storeName}_${url}`;
@@ -59,40 +50,22 @@ class Store {
         });
     }
 
-    static async setProductDataChromeStorage(storeName, url, productData) {
+    static async saveProductToChromeStorage(storeName, url, productData) {
         const key = `${storeName}_${url}`;
         return new Promise((resolve, reject) => {
             chrome.storage.sync.set({ [key]: productData }, function () {
                 if (chrome.runtime.lastError) {
                     return reject(new Error(chrome.runtime.lastError));
                 }
-                console.log(`Product for ${key} saved.`);
+                console.log("This product has been saved :", productData);
                 resolve();
             });
         });
     }
 
     static async updateProductPriceAndStock(storeName, url) {
-        try {
-            // Fetch and parse product data
-            const newProductData = await this.fetchPriceAndStock(url);
-
-            // Fetch existing products from 'aritzia_products'
-            const existingProduct = await Store.getProductDataFromChromeStorage(storeName, url);
-
-
-            // Create updated product object
-            const updatedProduct = { ...existingProduct, currentPrice: newProductData.price, stockInfo: newProductData.stockInfo };
-
-
-            await Store.setProductDataChromeStorage(storeName, url, updatedProduct);
-
-        } catch (error) {
-            console.error("Error updating product price:", error);
-        }
+        throw new Error("This method must be overridden by subclass");
     }
 
-
-    static async updateAllProductsPriceAndStock() { }
 }
 export default Store;
