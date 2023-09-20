@@ -6,16 +6,14 @@
 import Store from "../models/store.js";
 
 class Aritzia extends Store {
-    constructor(name) {
-        super(name);
+    constructor() {
+        super();
     }
 
-    async fetchPriceAndStock(url) {
+    static async fetchPriceAndStock(url) {
         let data = {};
-        const response = await fetch(url);
-        const htmlText = await response.text();
-        let parser = new DOMParser();  // Correct initialization
-        const doc = parser.parseFromString(htmlText, "text/html");
+       
+        const doc = await this.urlToDomParser(url);
     
 
         const priceElement = doc.querySelector("meta[property='og:price:amount']");
@@ -54,53 +52,41 @@ class Aritzia extends Store {
     }
 
 
-    async updateProductPriceAndStock(url, product) {
+    static async updateProductPriceAndStock(storeName, url) {
         try {
             // Fetch and parse product data
             const newProductData = await this.fetchPriceAndStock(url);
 
             // Fetch existing products from 'aritzia_products'
-            const existingData = await new Promise((resolve, reject) => {
-                chrome.storage.sync.get("aritzia_products", function(result) {
-                    if (chrome.runtime.lastError) {
-                        return reject(new Error(chrome.runtime.lastError));
-                    }
-                    resolve(result.aritzia_products || {});
-                });
-            });
+            const existingProduct = await Store.getProductDataFromChromeStorage(storeName, url);
+
 
             // Create updated product object
-            const updatedProduct = { ...product, currentPrice: newProductData.price, stockInfo: newProductData.stockInfo };
+            const updatedProduct = { ...existingProduct, currentPrice: newProductData.price, stockInfo: newProductData.stockInfo };
 
-            // Update the specific product within the existing data
-            existingData[url] = updatedProduct;
 
-            // Store back the complete 'aritzia_products' object
-            await new Promise((resolve, reject) => {
-                chrome.storage.sync.set({ "aritzia_products": existingData }, function() {
-                    if (chrome.runtime.lastError) {
-                        return reject(new Error(chrome.runtime.lastError));
-                    }
-                    resolve();
-                });
-            });
+            await Store.setProductDataChromeStorage(storeName, url, updatedProduct);
+
         } catch (error) {
             console.error("Error updating product price:", error);
         }
     }
 
-    async updateAllProductsPriceAndStock() {
-        try {
-            // Assuming fetchAllProductsData is a method that fetches all products under 'aritzia_products'
-            const allProducts = await this.fetchAllProductsData("aritzia_products"); 
-            for (const [url, product] of Object.entries(allProducts)) {
-                await this.updateProductPriceAndStock(url, product);
-            }
-        } catch (error) {
-            console.error("Error updating all product prices:", error);
-        }
-    }
+    // static async updateAllProductsPriceAndStock() {
+    // try {
+    //     // Fetch the list of URLs for the given store
+    //     const urls = await this.fetchUrlsForStore(storeName);  // You'll need to implement this method
 
+    //     // Update each product one by one
+    //     for (const url of urls) {
+    //         await this.updateProductPriceAndStock(storeName, url);
+    //     }
+    // } catch (error) {
+    //     console.error("Error updating all product prices:", error);
+    // }
+    //}
+
+    
 
     
 }

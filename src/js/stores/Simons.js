@@ -5,19 +5,19 @@
 //  getAllProducts()
 import Store from '../models/store.js';
 class Simons extends Store{
-    constructor(name) {
-        super(name);
+    constructor() {
+        super();
     }
 
-    async fetchPriceAndStock(url) {
+    static async fetchPriceAndStock(url) {
 
     }
 
-    async updateProductPriceAndStock(url, product) {
+    static async updateProductPriceAndStock(url, product) {
         // fetch logic 
     }
 
-    async updateAllProductsPriceAndStock() {
+    static async updateAllProductsPriceAndStock() {
         //update logic
     }
  

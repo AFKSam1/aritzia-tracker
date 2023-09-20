@@ -2,7 +2,7 @@
 import Aritzia from "../stores/aritzia.js";
 import Simons from "../stores/Simons.js";
 import Primitiveskate from "../stores/Primitiveskate.js";
-
+import ProductUpdater from "../services/ProductUpdater.js"
 
 document.addEventListener("DOMContentLoaded", () => {
     const clearDataBtn = document.getElementById("clear-data");
@@ -41,16 +41,14 @@ document.addEventListener("DOMContentLoaded", () => {
             // Clear existing content if any
             productListDiv.innerHTML = "";
     
-            for (const [key, products] of Object.entries(allData)) {
-                const domain = key.replace("_products", "");
+            for (const [key, product] of Object.entries(allData)) {
+                const [domain, url] = key.split("_", 2);  // Split the key into domain and url
                 const domainDiv = document.createElement("h3");
-                domainDiv.innerText = `Products from ${domain}:`;
+                domainDiv.innerText = `Product from ${domain}:`;
                 productListDiv.appendChild(domainDiv);
-    
-                for (const [url, product] of Object.entries(products)) {
-                    const productCard = document.createElement("div");
-                    productCard.className = "product-card";
-    
+
+                const productCard = document.createElement("div");
+                productCard.className = "product-card";
                     const imgElement = document.createElement("img");
                     imgElement.src = product.imgUrl;
                     imgElement.alt = product.name;
@@ -89,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         for (const [color, sizes] of Object.entries(product.stockInfo)) {
                             for (const [size, stock] of Object.entries(sizes)) {
                                 const stockOption = document.createElement("option");
-                                stockOption.text = `${color} - ${size} - ${stock > 0 ? 'In Stock' : 'Out of Stock'}`;
+                                stockOption.text = `${color} - ${size} - ${stock}`;
                                 stockDropdown.appendChild(stockOption);
                             }
                         }
@@ -98,17 +96,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     productCard.appendChild(stockDropdown); // Append stock dropdown to product card
                     productListDiv.appendChild(productCard);
                 }
-            }
+            
         });
     });
     
 
     const updateAllPricesBtn = document.getElementById("updateAllPricesBtn");
-    const aritziaStore = new Aritzia("aritzia"); // Assuming you've imported and instantiated Aritzia
 
     updateAllPricesBtn.addEventListener("click", () => {
-        aritziaStore
-            .updateAllProductsPriceAndStock()
+        ProductUpdater
+            .updateAllProductPricesAndStock()
             .then(() => {
                 console.log("All product prices updated");
             })

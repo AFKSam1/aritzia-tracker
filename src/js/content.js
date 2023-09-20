@@ -1,3 +1,4 @@
+
 const parsers = {
     aritzia: function (doc) {
         const parsedData = extractMetaData(doc, [
@@ -45,10 +46,8 @@ const parsers = {
         return parsedData;
     },
     
-    // ...
 };
 
-// ... (rest of the code remains the same)
 
 
 function extractMetaData(doc, metaList, attribute = "property") {
