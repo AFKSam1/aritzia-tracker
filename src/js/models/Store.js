@@ -1,5 +1,5 @@
 class Store {
-    constructor() {}
+    constructor() { }
 
     static async clearSpecificKey(key) {
         chrome.storage.sync.remove(key, () => {
@@ -7,10 +7,10 @@ class Store {
         });
     }
 
-    static async urlToDomParser(url){
+    static async urlToDomParser(url) {
         const response = await fetch(url);
         const htmlText = await response.text();
-        let parser = new DOMParser(); 
+        let parser = new DOMParser();
         const doc = parser.parseFromString(htmlText, "text/html");
         return doc;
     }
@@ -21,7 +21,7 @@ class Store {
         });
     }
 
-    static async fetchPriceAndStock(url) {}
+    static async fetchPriceAndStock(url) { }
 
     static async fetchAllProductsData(key) {
         return new Promise((resolve, reject) => {
@@ -54,7 +54,7 @@ class Store {
                     return reject(new Error(chrome.runtime.lastError));
                 }
                 resolve(result[key] || null);
-            
+
             });
         });
     }
@@ -72,9 +72,27 @@ class Store {
         });
     }
 
-    static async updateProductPriceAndStock(url, product) {
-        // Generic update logic (likely overridden by subclasses)
+    static async updateProductPriceAndStock(storeName, url) {
+        try {
+            // Fetch and parse product data
+            const newProductData = await this.fetchPriceAndStock(url);
+
+            // Fetch existing products from 'aritzia_products'
+            const existingProduct = await Store.getProductDataFromChromeStorage(storeName, url);
+
+
+            // Create updated product object
+            const updatedProduct = { ...existingProduct, currentPrice: newProductData.price, stockInfo: newProductData.stockInfo };
+
+
+            await Store.setProductDataChromeStorage(storeName, url, updatedProduct);
+
+        } catch (error) {
+            console.error("Error updating product price:", error);
+        }
     }
-    static async updateAllProductsPriceAndStock() {}
+
+
+    static async updateAllProductsPriceAndStock() { }
 }
 export default Store;

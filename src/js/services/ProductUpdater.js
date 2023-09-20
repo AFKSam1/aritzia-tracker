@@ -1,7 +1,7 @@
 // src/services/ProductUpdater.js
 
 import Store from "../models/store.js";
-import initializeStoreClasses from "../stores/storeConfig.js";  // Assuming this is how you get the supported stores
+import initializeStoreClasses from "../stores/storeConfig.js";
 
 class ProductUpdater {
     static async updateAllProductPricesAndStock() {
@@ -27,13 +27,13 @@ class ProductUpdater {
                 if (chrome.runtime.lastError) {
                     return reject(new Error(chrome.runtime.lastError));
                 }
-    
+
                 const allKeys = Object.keys(allData);
                 resolve(allKeys);
             });
         });
     }
-    
+
 }
 
 export default ProductUpdater;
