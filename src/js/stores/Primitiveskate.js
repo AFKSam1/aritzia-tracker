@@ -51,7 +51,7 @@ class Primitiveskate extends Store {
 
 
             // Create updated product object
-            const updatedProduct = { ...existingProduct, currentPrice: newProductData.price, stockInfo: newProductData.stockInfo };
+            const updatedProduct = { ...existingProduct, currentPrice: newProductData.price, stockInfo: newProductData.stockInfo, priceHistory: [...existingProduct.priceHistory, parseFloat(newProductData.price)] };
 
             await this.saveProductToChromeStorage(storeName, url, updatedProduct);
 
