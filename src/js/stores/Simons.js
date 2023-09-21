@@ -59,7 +59,12 @@ class Simons extends Store {
 
 
             // Create updated product object
-            const updatedProduct = { ...existingProduct, currentPrice: newProductData.price, stockInfo: newProductData.stockInfo, priceHistory: [...existingProduct.priceHistory, parseFloat(newProductData.price)] };
+            const updatedProduct = { ...existingProduct, 
+                currentPrice: newProductData.price, 
+                stockInfo: newProductData.stockInfo, 
+                priceHistory: [...existingProduct.priceHistory, parseFloat(newProductData.price)], 
+                discount: Math.round((newProductData.price / existingProduct.priceWhenAdded) * 100)}
+
 
             await this.saveProductToChromeStorage(storeName, url, updatedProduct);
 
