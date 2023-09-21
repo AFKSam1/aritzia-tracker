@@ -33,6 +33,9 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     });
+    const fetchDataBtn = document.getElementById("fetchDataBtn");
+
+    fetchDataBtn.addEventListener("click", () => {
     const productListDiv = document.getElementById("product-list");
     // Clear existing content if any
     productListDiv.innerHTML = "";
@@ -105,7 +108,12 @@ document.addEventListener("DOMContentLoaded", () => {
             defaultOption.selected = true;
             stockDropdown.appendChild(defaultOption);
 
-            if (Array.isArray(product.stockInfo)) {
+            if (typeof product.stockInfo === 'string'){
+                const stockOption = document.createElement("option");
+                stockOption.text = `${product.stockInfo}`;
+                stockDropdown.appendChild(stockOption);
+
+            }else if (Array.isArray(product.stockInfo)) {
                 product.stockInfo.forEach((stockItem) => {
                     const stockOption = document.createElement("option");
                     stockOption.text = `${stockItem.size} - ${stockItem.inventoryStatus}`;
@@ -142,9 +150,11 @@ document.addEventListener("DOMContentLoaded", () => {
             productCard.appendChild(detailsDiv);
 
             storeDiv.appendChild(productCard);
+        
         }
+    })
     });
-
+    
     const updateAllPricesBtn = document.getElementById("updateAllPricesBtn");
 
     updateAllPricesBtn.addEventListener("click", () => {
