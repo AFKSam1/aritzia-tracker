@@ -6,20 +6,15 @@ class Golftown extends Store {
     }
 
     static async fetchPriceAndStock(url) {
-        let data = {};
+        const parsedData = {};
         const doc = await this.urlToDomParser(url);
+        const scriptElement = doc.getElementById("product-data");
+        const decodedString = scriptElement.defaultValue.replace(/&quot;/g, '"');
 
-        const scriptElement = doc.querySelector('script[data-section-type="static-product"]');
-        if (scriptElement) {
-            const jsonObj = JSON.parse(scriptElement.innerHTML);
-            data.price = (jsonObj.product.price / 100).toFixed(2);
-            data.stockInfo = jsonObj.product.variants.map(({ title, inventory_quantity }) => ({
-                size: title,
-                inventoryStatus: inventory_quantity,
-            }));
-        }
-        console.log(data);
-        return data;
+        const jsonObject = JSON.parse(decodedString);
+        parsedData.price = jsonObject.price;
+        parsedData.stockInfo = jsonObject.availability;
+        return parsedData;
     }
 
     static async fetchProduct(url) {
@@ -28,8 +23,6 @@ class Golftown extends Store {
         const doc = await this.urlToDomParser(url);
         const scriptElement = doc.getElementById("product-data");
         const decodedString = scriptElement.defaultValue.replace(/&quot;/g, '"');
-
-// Then, parse the JSON string into an object
         const jsonObject = JSON.parse(decodedString);
 
         parsedData.title = jsonObject.name;
@@ -50,11 +43,13 @@ class Golftown extends Store {
 
 
             // Create updated product object
-            const updatedProduct = { ...existingProduct, 
-                currentPrice: newProductData.price, 
-                stockInfo: newProductData.stockInfo, 
-                priceHistory: [...existingProduct.priceHistory, parseFloat(newProductData.price)], 
-                discount: Math.round((newProductData.price / existingProduct.priceWhenAdded) * 100)}
+            const updatedProduct = {
+                ...existingProduct,
+                currentPrice: newProductData.price,
+                stockInfo: newProductData.stockInfo,
+                priceHistory: [...existingProduct.priceHistory, parseFloat(newProductData.price)],
+                discount: Math.round((newProductData.price / existingProduct.priceWhenAdded) * 100)
+            }
 
             await this.saveProductToChromeStorage(storeName, url, updatedProduct);
 
