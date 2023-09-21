@@ -31,21 +31,21 @@ const parsers = {
             { itemprop: "image", key: "imgUrl" },
             { itemprop: "name", key: "title" }
         ], "itemprop");
-    
+
         // Extracting the price
         const priceElement = doc.querySelector(".single-product-price");
         if (priceElement) {
             parsedData.price = parseFloat(priceElement.innerText);
         }
-    
+
         const scriptContent = Array.from(doc.querySelectorAll('script')).map(el => el.textContent).join('\n');
         const maxStocks = extractJsonFromScript(scriptContent, /product\.maxStocks\s*=\s*(\{[\s\S]*?\});/);
         const sizesEn = extractJsonFromScript(scriptContent, /product\.sizesEn\s*=\s*(\{[\s\S]*?\});/);
-    
+
         parsedData.stockInfo = mapColorsToStocks(doc, maxStocks, sizesEn);
         return parsedData;
     },
-    
+
 };
 
 
@@ -95,7 +95,7 @@ function parseDomainHtml(domain, doc) {
     return parser ? parser(doc) : null;
 }
 
-function mapColorsToStocks(doc, maxStocks,sizesEn) {
+function mapColorsToStocks(doc, maxStocks, sizesEn) {
     const colorStockMap = {}; // Object to hold the mapping between color names and their stocks
 
     // Iterate over each color element in the DOM
@@ -106,7 +106,7 @@ function mapColorsToStocks(doc, maxStocks,sizesEn) {
 
         // Create an object to hold the stocks of each size for this color
         const colorStocks = {};
-        
+
         // Iterate over the maxStocks object to find the stocks that belong to this color
         for (const [key, value] of Object.entries(maxStocks)) {
             const [stockColorId, sizeCode] = key.split(':'); // Split the key to get the color ID and size code

@@ -15,11 +15,7 @@ class Store {
         return doc;
     }
 
-    static async clearAllChromeStorage() {
-        chrome.storage.sync.clear(() => {
-            console.log("Storage is cleared.");
-        });
-    }
+
 
     static async fetchPriceAndStock(url) {
         throw new Error("This method must be overridden by subclass");

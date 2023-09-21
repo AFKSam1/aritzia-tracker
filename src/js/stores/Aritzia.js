@@ -1,9 +1,6 @@
-// Inherited methods:
-//  addProduct(product)
-//  removeProduct(productId)
-//  findProductById(productId)
-//  getAllProducts()
+
 import Store from "../models/store.js";
+import helpers from "../utils/helpers.js"
 
 class Aritzia extends Store {
     constructor() {
@@ -14,7 +11,7 @@ class Aritzia extends Store {
     static async fetchProduct(url) {
         const doc = await this.urlToDomParser(url);
 
-        const parsedData = this.extractMetaData(doc, [
+        const parsedData = helpers.extractMetaData(doc, [
             { property: "og:title", key: "title" },
             { property: "og:price:amount", key: "price" },
             { property: "og:description", key: "description" },
@@ -88,15 +85,6 @@ class Aritzia extends Store {
     }
 
 
-    static extractMetaData(doc, metaList, attribute = "property") {
-        return metaList.reduce((acc, { property, key, itemprop }) => {
-            const element = doc.querySelector(`meta[${attribute}='${property || itemprop}']`);
-            if (element) {
-                acc[key] = element.getAttribute("content");
-            }
-            return acc;
-        }, {});
-    }
 
 
 

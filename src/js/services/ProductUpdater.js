@@ -12,7 +12,7 @@ class ProductUpdater {
             const supportedStores = Object.keys(initializeStoreClasses.initializeStoreClasses());
 
             for (const key of allKeys) {
-                const [storeName, url] = key.split('_');
+                const [storeName, url] = helpers.splitDomainFromUrl(key);
                 if (supportedStores.includes(storeName)) {
                     const StoreClass = initializeStoreClasses.initializeStoreClasses()[storeName];
                     await StoreClass.updateProductPriceAndStock(storeName, url);
@@ -95,6 +95,12 @@ class ProductUpdater {
             return;
         }
         storeClasses[domain].fetchProduct(url);
+    }
+
+    static async clearAllChromeStorage() {
+        chrome.storage.sync.clear(() => {
+            console.log("Storage is cleared.");
+        });
     }
 
 

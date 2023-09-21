@@ -57,6 +57,19 @@ h2 {
   margin-bottom: 0.5em;
 }
 
+.product-card h2 {
+  white-space: nowrap;
+  /* Prevents the text from wrapping into next line */
+  overflow: hidden;
+  /* Hides the content that overflows the box */
+  text-overflow: ellipsis;
+  /* Displays ellipsis to show the text has been truncated */
+  max-width: 200px;
+  /* Sets a maximum width for the title */
+}
+
+
+
 .store-title {
   text-align: center;
 }

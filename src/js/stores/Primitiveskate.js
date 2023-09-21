@@ -1,3 +1,4 @@
+
 import Store from '../models/store.js';
 class Primitiveskate extends Store {
     constructor() {

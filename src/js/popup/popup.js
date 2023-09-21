@@ -1,10 +1,6 @@
 //popup.js
-import Aritzia from "../stores/aritzia.js";
-import Simons from "../stores/Simons.js";
-import Primitiveskate from "../stores/Primitiveskate.js";
 import ProductUpdater from "../services/ProductUpdater.js"
 import initializeStoreClasses from "../stores/storeConfig.js";
-import helpers from "../utils/helpers.js";
 
 
 const supportedStores = Object.keys(initializeStoreClasses.initializeStoreClasses());
@@ -13,13 +9,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const clearDataBtn = document.getElementById("clear-data");
 
   clearDataBtn.addEventListener("click", () => {
-    chrome.runtime.sendMessage({ command: "clearChromeStorage", storeName: "aritzia" }, (response) => {
-      if (response.success) {
-        console.log("clearChromeStorage success");
-      } else {
-        console.log("clearChromeStorage failed");
-      }
-    });
+    ProductUpdater
+      .clearAllChromeStorage()
+      .then(() => {
+        console.log("All products have been cleared from storage");
+      }).catch((error) => {
+        console.log("Error clear storage")
+      })
+
   });
 
   const bookmarkButton = document.getElementById("bookmarkButton");
@@ -86,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
         priceElement.innerText = `Current Price: ${product.currentPrice}`;
 
         const prevPriceElement = document.createElement("h4");
-        prevPriceElement.innerText = `Price when added to the list: ${product.priceWhenAdded}`;
+        prevPriceElement.innerText = `Price when added: ${product.priceWhenAdded}`;
 
         productCard.appendChild(imgElement);
         productCard.appendChild(titleElement);
