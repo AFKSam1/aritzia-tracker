@@ -42,9 +42,10 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
   });
+  
   const fetchDataBtn = document.getElementById("fetchDataBtn");
 
-  fetchDataBtn.addEventListener("click", () => {
+  
     const productListDiv = document.getElementById("product-list");
     // Clear existing content if any
     productListDiv.innerHTML = "";
@@ -162,7 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       }
     })
-  });
+
 
   const updateAllPricesBtn = document.getElementById("updateAllPricesBtn");
 

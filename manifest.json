@@ -1,38 +1,30 @@
 {
-  "manifest_version": 3,
-  "name": "Price Drop Tracker",
-  "version": "1.0.0",
-  "description": "Tracks price drops of shopping cart items on different stores.",
-  "permissions": [
-    "storage",
-    "webRequest",
-    "webRequestBlocking",
-    "tabs",
-    "webNavigation",
-    "scripting",
-    "activeTab",
-    "alarms"
-  ],
-  "host_permissions": [
-    "http://*/*",
-    "https://*/*"
-  ],
-  "background": {
-    "service_worker": "./src/js/background.js",
-    "type": "module"
-  },
-  "content_scripts": [
-    {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "./src/js/content.js"
-      ],
-      "run_at": "document_end"
+    "manifest_version": 3,
+    "name": "Price Drop TESTRACK",
+    "version": "1.0.0",
+    "description": "Tracks price drops of shopping cart items on different stores.",
+    "permissions": [
+        "storage",
+        "webRequest",
+        "webRequestBlocking",
+        "tabs",
+        "webNavigation",
+        "scripting",
+        "activeTab",
+        "alarms"
+    ],
+    "host_permissions": ["http://*/*", "https://*/*"],
+    "background": {
+        "service_worker": "./js/background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["./js/content.js"],
+            "run_at": "document_start"
+        }
+    ],
+    "action": {
+        "default_popup": "./js/popup/popup.html"
     }
-  ],
-  "action": {
-    "default_popup": "./src/js/popup/popup.html"
-  }
 }
