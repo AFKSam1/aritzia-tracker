@@ -6,3 +6,4 @@ TODO:
 - Make the button draggable
 - Update stock every morning at 7am automatically (Has to be launched from background.js)
 - FEtch the list of url that the button should appear from storeconfig.json
+- Autobuy products when come on sale (Would need to specify size)
