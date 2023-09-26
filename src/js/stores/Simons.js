@@ -20,7 +20,14 @@ class Simons extends Store {
             parsedData.price = parseFloat(priceElement.innerText);
         }
 
+ 
+
         const scriptContent = Array.from(doc.querySelectorAll('script')).map(el => el.textContent).join('\n');
+        const salePrice = this.extractJsonFromScript(scriptContent, /product\.salePrice\s*=\s*"([^"]+)";/);
+        
+        if(salePrice){
+            parsedData.price = parseFloat(salePrice);
+        }
         const maxStocks = this.extractJsonFromScript(scriptContent, /product\.maxStocks\s*=\s*(\{[\s\S]*?\});/);
         const sizesEn = this.extractJsonFromScript(scriptContent, /product\.sizesEn\s*=\s*(\{[\s\S]*?\});/);
 
@@ -63,7 +70,7 @@ class Simons extends Store {
                 currentPrice: newProductData.price, 
                 stockInfo: newProductData.stockInfo, 
                 priceHistory: [...existingProduct.priceHistory, parseFloat(newProductData.price)], 
-                discount: Math.round((newProductData.price / existingProduct.priceWhenAdded) * 100)}
+                discount: helpers.discountPercentCalc(newProductData.price,existingProduct.priceWhenAdded)}
 
 
             await this.saveProductToChromeStorage(storeName, url, updatedProduct);

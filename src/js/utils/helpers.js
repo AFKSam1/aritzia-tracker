@@ -68,6 +68,14 @@ export function extractMetaData(doc, metaList, attribute = "property") {
     }, {});
 }
 
+export function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export function discountPercentCalc(newProductPrice,priceWhenAdded){
+    return Math.round(100-(newProductPrice / priceWhenAdded) * 100)
+}
+
 const allFunctions = {
     createHeadersObject,
     extractBaseDomain,
@@ -75,6 +83,8 @@ const allFunctions = {
     urlToDomParser,
     splitDomainFromUrl,
     extractMetaData,
+    delay,
+    discountPercentCalc,
 };
 
 export default allFunctions;

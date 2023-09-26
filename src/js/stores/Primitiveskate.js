@@ -1,5 +1,7 @@
 
 import Store from '../models/store.js';
+import helpers from "../utils/helpers.js"
+
 class Primitiveskate extends Store {
     constructor() {
         super();
@@ -55,7 +57,7 @@ class Primitiveskate extends Store {
                 currentPrice: newProductData.price, 
                 stockInfo: newProductData.stockInfo, 
                 priceHistory: [...existingProduct.priceHistory, parseFloat(newProductData.price)], 
-                discount: Math.round((newProductData.price / existingProduct.priceWhenAdded) * 100)}
+                discount: helpers.discountPercentCalc(newProductData.price,existingProduct.priceWhenAdded)}
 
             await this.saveProductToChromeStorage(storeName, url, updatedProduct);
 

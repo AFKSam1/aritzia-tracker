@@ -1,11 +1,7 @@
 class Store {
     constructor() { }
 
-    static async clearSpecificKey(key) {
-        chrome.storage.sync.remove(key, () => {
-            console.log(`Specific ${key} is cleared.`);
-        });
-    }
+
 
     static async urlToDomParser(url) {
         const response = await fetch(url);
@@ -14,8 +10,6 @@ class Store {
         const doc = parser.parseFromString(htmlText, "text/html");
         return doc;
     }
-
-
 
     static async fetchPriceAndStock(url) {
         throw new Error("This method must be overridden by subclass");

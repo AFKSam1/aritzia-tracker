@@ -6,23 +6,23 @@ import helpers from "../utils/helpers.js"
 import Product from "../models/Product.js";
 
 class ProductUpdater {
-    static async updateAllProductPricesAndStock() {
-        try {
-            const allKeys = await this.getAllKeysFromStorage();  // You'll need to implement this method in Store
-            const supportedStores = Object.keys(initializeStoreClasses.initializeStoreClasses());
-
-            for (const key of allKeys) {
-                const [storeName, url] = helpers.splitDomainFromUrl(key);
-                if (supportedStores.includes(storeName)) {
-                    const StoreClass = initializeStoreClasses.initializeStoreClasses()[storeName];
-                    await StoreClass.updateProductPriceAndStock(storeName, url);
+        static async updateAllProductPricesAndStock() {
+            try {
+                const allKeys = await this.getAllKeysFromStorage();  // You'll need to implement this method in Store
+                const supportedStores = Object.keys(initializeStoreClasses.initializeStoreClasses());
+    
+                for (const key of allKeys) {
+                    const [storeName, url] = helpers.splitDomainFromUrl(key);
+                    if (supportedStores.includes(storeName)) {
+                        const StoreClass = initializeStoreClasses.initializeStoreClasses()[storeName];
+                        await StoreClass.updateProductPriceAndStock(storeName, url);
+                        await helpers.delay(1000);  // Adding a delay of 1 second
+                    }
                 }
+            } catch (error) {
+                console.error("Error updating all product prices:", error);
             }
-        } catch (error) {
-            console.error("Error updating all product prices:", error);
         }
-    }
-
     static async getAllKeysFromStorage() {
         return new Promise((resolve, reject) => {
             chrome.storage.sync.get(null, (allData) => {
@@ -33,6 +33,12 @@ class ProductUpdater {
                 const allKeys = Object.keys(allData);
                 resolve(allKeys);
             });
+        });
+    }
+
+    static async removeSpecificItemFromChromeStorage(key) {
+        chrome.storage.sync.remove(key, () => {
+            console.log(`Specific ${key} is cleared.`);
         });
     }
 
