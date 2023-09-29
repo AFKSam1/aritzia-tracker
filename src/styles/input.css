@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.store-title:hover {
+    background-color: #f0f0f0; /* light grey background on hover */
+    transition: background-color 0.3s ease;
+  }
+  
